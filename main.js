@@ -99,10 +99,12 @@
 
     global.conn = simple.makeWASocket(connectionOptions)
 
+    // Mengambil nomor dari Environment Variable
+    global.pairingNumber = process.env.PAIRING_NUMBER || ""; 
+
     if (opts['pairing'] && !conn.authState.creds.registered) {
-        let phoneNumber
-        if (!!global.pairingNumber) {
-            phoneNumber = global.pairingNumber.toString().replace(/[^0-9]/g, '')
+        let phoneNumber = global.pairingNumber.toString().replace(/[^0-9]/g, '');
+
             if (!Object.keys(PHONENUMBER_MCC1).some(v => phoneNumber.startsWith(v))) {
                 console.log(chalk.bgBlack(chalk.redBright("Start with your country's WhatsApp code, Example : 62xxx")))
                 process.exit(0)
