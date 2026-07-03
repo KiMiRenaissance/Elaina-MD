@@ -134,8 +134,30 @@
 
     global.conn = simple.makeWASocket(connectionOptions)
 
-    // Mengambil nomor dari Environment Variable
-    global.pairingNumber = process.env.PAIRING_NUMBER || ""; 
+        // Mengambil nomor dari Environment Variable Back4App
+        global.pairingNumber = process.env.PAIRING_NUMBER || ""; 
+
+        if (!conn.authState.creds.registered) {
+            if (global.pairingNumber) {
+                let phoneNumber = global.pairingNumber.toString().replace(/[^0-9]/g, '');
+
+                if (!Object.keys(PHONENUMBER_MCC1).some(v => phoneNumber.startsWith(v))) {
+                    console.log(chalk.bgBlack(chalk.redBright("Start with your country's WhatsApp code, Example : 62xxx")))
+                    process.exit(0)
+                }
+
+                setTimeout(async () => {
+                    let code = await conn.requestPairingCode(phoneNumber)
+                    code = code?.match(/.{1,4}/g)?.join("-") || code
+                    console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
+                }, 3000)
+            } else {
+            // Jika nomor belum diisi di Back4App, bot akan memberi tahu di log dan berhenti sementara
+                console.log(chalk.bgBlack(chalk.redBright("PAIRING_NUMBER belum diatur!")))
+                console.log(chalk.bgBlack(chalk.redBright("Silakan tambahkan PAIRING_NUMBER di Environment Variables Back4App.")))
+                process.exit(0)
+            }
+        }
 
     if (opts['pairing'] && !conn.authState.creds.registered) {
         let phoneNumber = global.pairingNumber.toString().replace(/[^0-9]/g, '');
