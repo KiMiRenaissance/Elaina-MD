@@ -8,6 +8,10 @@ const Readline = require('readline')
 const yargs = require('yargs/yargs')
 const rl = Readline.createInterface(process.stdin, process.stdout)
 
+if (process.env.NODE_ENV === 'production') {
+    rl.close(); // Menutup readline agar tidak menunggu input keyboard
+}
+
 CFonts.say('Elaina-MD', {
   //colors: ['#f2aa4c'],
   gradient: ['red', 'magenta'],
@@ -64,7 +68,7 @@ function start(file) {
     })
   })
   let opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
-  if (!opts['test'])
+  if (!opts['test'] && process.env.NODE_ENV !== 'production')
     if (!rl.listenerCount()) rl.on('line', line => {
       p.emit('message', line.trim())
     })
@@ -72,3 +76,5 @@ function start(file) {
 }
 
 start('main.js')
+
+require('http').createServer((req, res) => res.end('Bot is running!')).listen(8080);
