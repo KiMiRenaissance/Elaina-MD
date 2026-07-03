@@ -1,4 +1,4 @@
-FROM        --platform=$TARGETOS/$TARGETARCH node:17-bullseye-slim
+FROM        --platform=$TARGETOS/$TARGETARCH node:22-bullseye-slim
 
 LABEL       author="FokusDotId" maintainer="40955113+FokusDotId@users.noreply.github.com"
 
