@@ -22,6 +22,7 @@
     const WebSocket = require('ws')
     const path = require('path')
     const fs = require('fs')
+    const mongoose = require('mongoose')
     const yargs = require('yargs/yargs')
     const cp = require('child_process')
     const _ = require('lodash')
@@ -55,7 +56,23 @@
     global.prefix = new RegExp('^[' + (opts['prefix'] || '!+/#.') + ']')
     const store = makeInMemoryStore({ logger: P().child({ level: 'fatal', stream: 'store' }) })
 
-    global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : /mongodb/.test(opts['db']) ? new mongoDB(opts['db']) : new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`))
+    // Mengambil URL dari Back4App atau argumen manual
+    const dbUrl = process.env.DATABASE_URL || opts['db'];
+
+    if (dbUrl && dbUrl.includes('mongodb')) {
+    // Menghubungkan ke MongoDB menggunakan Mongoose
+        mongoose.connect(dbUrl).then(() => {
+            console.log("Berhasil terhubung ke Database MongoDB");
+        }).catch(err => {
+            console.error("Gagal koneksi ke MongoDB:", err);
+        });
+    // Menyesuaikan agar global.db tetap bisa dipakai oleh sistem bot
+        global.db = new mongoDB(dbUrl); 
+    } else {
+    // Fallback ke JSON jika tidak ada MongoDB
+        global.db = new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`);
+    }
+    
     global.DATABASE = global.db // Backwards Compatibility
     global.loadDatabase = async function loadDatabase() {
         if (global.db.READ) return new Promise((resolve) => setInterval(function () {
