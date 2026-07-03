@@ -122,20 +122,26 @@
     if (opts['pairing'] && !conn.authState.creds.registered) {
         let phoneNumber = global.pairingNumber.toString().replace(/[^0-9]/g, '');
 
-            if (!Object.keys(PHONENUMBER_MCC1).some(v => phoneNumber.startsWith(v))) {
-                console.log(chalk.bgBlack(chalk.redBright("Start with your country's WhatsApp code, Example : 62xxx")))
-                process.exit(0)
-            }
-        } else {
+        if (!Object.keys(PHONENUMBER_MCC1).some(v => phoneNumber.startsWith(v))) {
+            console.log(chalk.bgBlack(chalk.redBright("Start with your country's WhatsApp code, Example : 62xxx")))
+            process.exit(0)
+        }
+
+        setTimeout(async () => {
+            let code = await conn.requestPairingCode(phoneNumber)
+            code = code?.match(/.{1,4}/g)?.join("-") || code
+            console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
+        }, 3000)
+
+    } else if (!conn.authState.creds.registered) {
+        let phoneNumber = await question(chalk.bgBlack(chalk.greenBright(`Please type your WhatsApp number : `)))
+        phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
+        // Ask again when entering the wrong number
+        if (!Object.keys(PHONENUMBER_MCC1).some(v => phoneNumber.startsWith(v))) {
+            console.log(chalk.bgBlack(chalk.redBright("Start with your country's WhatsApp code, Example : 62xxx")))
             phoneNumber = await question(chalk.bgBlack(chalk.greenBright(`Please type your WhatsApp number : `)))
             phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
-            // Ask again when entering the wrong number
-            if (!Object.keys(PHONENUMBER_MCC1).some(v => phoneNumber.startsWith(v))) {
-                console.log(chalk.bgBlack(chalk.redBright("Start with your country's WhatsApp code, Example : 62xxx")))
-                phoneNumber = await question(chalk.bgBlack(chalk.greenBright(`Please type your WhatsApp number : `)))
-                phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
-                rl.close()
-            }
+            rl.close()
         }
 
         setTimeout(async () => {
