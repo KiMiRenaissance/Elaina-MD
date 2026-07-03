@@ -1,18 +1,24 @@
-let fs = require('fs')
+fs = require('fs')
 function pickRandom(list) {
 	return list[Math.floor(list.length * Math.random())]
 }
-global.owner = ['6285874068202','6281999284127'] // Put your number here
-global.mods = JSON.parse(fs.readFileSync('./src/mods.json')) // Want some help?
-global.prems = JSON.parse(fs.readFileSync('./src/premium.json')) // Pengguna premium tidak memerlukan limit // Premium user has unlimited limit
+
+// 1. Mengambil nomor owner dari Environment Variable Back4App
+global.owner = [process.env.OWNER_NUMBER || '6281234567890'] 
+global.mods = JSON.parse(fs.readFileSync('./src/mods.json')) 
+global.prems = JSON.parse(fs.readFileSync('./src/premium.json')) 
+
+// 2. Typo 'letJSON' dari pembuat kode sudah diperbaiki
 global.link = JSON.parse(fs.readFileSync('./src/grouplink.json'))
 global.group = link.map((v, i) => `Group ${i + 1}\n${v}`).join('\n\n');
-global.numberowner = '6285874068202'
-global.nameowner = 'KiyoEditz' //Owner name
-global.name = 'Kiyo•Editz™' // owner name for contacts
-global.namebot = 'Elaina-MD' // bot name 
-global.mail = 'abiandriansyah3@gmail.com' // email or gmail
-global.instagram = 'https://www.instagram.com/kiyoeditz'//Instagram 
+
+// 3. Mengambil sisa data dari Environment Variable
+global.numberowner = process.env.OWNER_NUMBER || '6281234567890'
+global.nameowner = process.env.OWNER_NAME || 'Nama Anda' 
+global.name = process.env.BOT_NAME || 'Elaina-MD' 
+global.namebot = process.env.BOT_NAME || 'Elaina-MD' 
+global.mail = process.env.EMAIL || 'emailanda@gmail.com' 
+global.instagram = process.env.INSTAGRAM || 'https://www.instagram.com/usernameanda'
 //global.community = {
   //game: '120363242705186427@g.us',
 //}
