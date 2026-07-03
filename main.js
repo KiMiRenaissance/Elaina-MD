@@ -49,6 +49,13 @@
 
     const NodeCache = require('node-cache')
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+    if (process.env.NODE_ENV === 'production') {
+        rl.question = (q, cb) => {
+            console.log(q);
+            cb(''); // Memberikan input kosong secara otomatis daripada crash
+        };
+    }
+        
     const question = (text) => new Promise((resolve) => rl.question(text, resolve))
     const msgRetryCounterCache = new NodeCache()
 
