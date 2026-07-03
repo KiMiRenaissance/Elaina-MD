@@ -1,13 +1,19 @@
 (async () => {
     require('./config')
+    
+    // Perbaikan pemanggilan Baileys
+    const baileys = require('@whiskeysockets/baileys')
     const {
         useMultiFileAuthState,
         DisconnectReason,
-        makeInMemoryStore,
         jidNormalizedUser,
         makeCacheableSignalKeyStore,
         PHONENUMBER_MCC
-    } = require('@whiskeysockets/baileys')
+    } = baileys
+    
+    // Mencari makeInMemoryStore secara otomatis dari versi Baileys yang terinstal
+    const makeInMemoryStore = baileys.makeInMemoryStore || baileys.default?.makeInMemoryStore
+
     const readline = require('readline')
     const PHONENUMBER_MCC1 = {
         "1": "US/Canada",
@@ -54,7 +60,11 @@
     global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
     // console.log({ opts })
     global.prefix = new RegExp('^[' + (opts['prefix'] || '!+/#.') + ']')
-    const store = makeInMemoryStore({ logger: P().child({ level: 'fatal', stream: 'store' }) })
+    
+    // Mencegah crash (berhenti mendadak) saat pembentukan store
+    const store = makeInMemoryStore 
+        ? makeInMemoryStore({ logger: P().child({ level: 'fatal', stream: 'store' }) }) 
+        : { bind: () => {}, loadMessage: () => {}, saveToFile: () => {}, readFromFile: () => {} }
 
     // Mengambil URL dari Back4App atau argumen manual
     const dbUrl = process.env.DATABASE_URL || opts['db'];
