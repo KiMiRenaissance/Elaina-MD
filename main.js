@@ -77,7 +77,15 @@
             console.error("Gagal koneksi ke MongoDB:", err);
         });
     // Menyesuaikan agar global.db tetap bisa dipakai oleh sistem bot
-        global.db = new mongoDB(dbUrl); 
+    // 1. Menghilangkan peringatan/spam dari Mongoose
+        mongoose.set('strictQuery', false);
+
+    // 2. Deteksi otomatis format Class mongoDB yang benar
+        const MongoDBConstructor = typeof mongoDB === 'function' ? mongoDB : (mongoDB.default || mongoDB.mongoDB);
+
+    // 3. Eksekusi koneksi database
+        global.db = new MongoDBConstructor(dbUrl);
+                  
     } else {
     // Fallback ke JSON jika tidak ada MongoDB
         global.db = new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`);
