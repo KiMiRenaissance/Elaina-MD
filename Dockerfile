@@ -15,15 +15,15 @@ USER        container
 ENV         USER=container HOME=/home/container
 WORKDIR     /home/container
 
-COPY        ./entrypoint.sh /entrypoint.sh
+# Menggunakan --chown agar file menjadi hak milik user 'container'
+COPY        --chown=container:container ./entrypoint.sh /entrypoint.sh
+COPY        --chown=container:container package.json .
 
-# Kita instal dependensi di dalam folder project, bukan global
-COPY        package.json .
+# Instalasi dependency normal
 RUN         npm install
 
-# Instal nodemon secara lokal sebagai devDependency agar tidak error permission
-RUN         npm install nodemon --save-dev
+# Salin sisa file dengan hak milik yang benar
+COPY        --chown=container:container . .
 
-COPY        . .
-
-CMD         npx nodemon index.js
+# Jalankan menggunakan Node biasa, lebih stabil untuk produksi
+CMD         ["node", "index.js", "--server"]
