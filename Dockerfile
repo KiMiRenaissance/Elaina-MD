@@ -12,18 +12,18 @@ RUN         apt update \
             && useradd -m -d /home/container container
 
 USER        container
-ENV         USER=container HOME=/home/container
+# Saya menambahkan ENV PORT=8080 di sini
+ENV         USER=container HOME=/home/container PORT=8080
 WORKDIR     /home/container
 
-# Menggunakan --chown agar file menjadi hak milik user 'container'
 COPY        --chown=container:container ./entrypoint.sh /entrypoint.sh
 COPY        --chown=container:container package.json .
 
-# Instalasi dependency normal
 RUN         npm install
 
-# Salin sisa file dengan hak milik yang benar
 COPY        --chown=container:container . .
 
-# Jalankan menggunakan Node biasa, lebih stabil untuk produksi
+# Ini adalah 'pintu' yang diminta oleh Back4App
+EXPOSE      8080
+
 CMD         ["node", "index.js", "--server"]
