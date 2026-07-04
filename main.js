@@ -96,7 +96,7 @@ process.on('warning', (warning) => {
                 let code = await conn.requestPairingCode(phoneNumber)
                 code = code?.match(/.{1,4}/g)?.join("-") || code
                 console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
-            }, 5000)
+            }, 15000)
         } else {
             console.log(chalk.red("PAIRING_NUMBER belum diatur di Environment Variables!"));
         }
