@@ -93,10 +93,14 @@ process.on('warning', (warning) => {
         if (global.pairingNumber) {
             let phoneNumber = global.pairingNumber.toString().replace(/[^0-9]/g, '');
             setTimeout(async () => {
-                let code = await conn.requestPairingCode(phoneNumber)
-                code = code?.match(/.{1,4}/g)?.join("-") || code
-                console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
-            }, 15000)
+                try {
+                    let code = await conn.requestPairingCode(phoneNumber);
+                    code = code?.match(/.{1,4}/g)?.join("-") || code;
+                    console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)));
+                } catch (err) {
+                    console.log(chalk.bgRed(chalk.white(" [Gagal Meminta Kode] Server WhatsApp menolak permintaan saat ini. Menunggu koneksi stabil... ")));
+                }
+            }, 15000);
         } else {
             console.log(chalk.red("PAIRING_NUMBER belum diatur di Environment Variables!"));
         }
